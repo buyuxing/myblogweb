@@ -44,7 +44,7 @@ async def execute(sql,args):
 	with(await __pool) as conn:
 		try:
 			cur = await conn.cursor()
-			await cur.execute(sql.replace('?'),'%s',args)
+			await cur.execute(sql.replace('?','%s'),args)
 			affected = cur.rowcount
 			await cur.close()
 		except Exception as e:
@@ -100,12 +100,13 @@ class Model(dict,metaclass=ModelMetaclass):
 	def __setattr__(self,key,value):
 		self[key] = value
 	def getValue(self,key):
-		return getaattr(self,key, None)
+		return getattr(self,key, None)
+
 	def getValueOrDefault(self,key):
-		value = getValue(self, key)
+		value = self.getValue(key)
 		if value is None:
 			field = self.__mappings__[key]
-			if field.default() is not None:
+			if field.default is not None:
 				value = field.default() if callable(field.default) else field.default
 				logging.debug('using default value for %s: %s' % (key, str(value)))
 				setattr(self, key, value)

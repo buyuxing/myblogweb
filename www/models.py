@@ -17,7 +17,7 @@ class User(Model):
 	nickname = StringField(ddl='varchar(50)')
 	img = StringField(ddl='varchar(50)')
 	email = StringField(ddl='varchar(500)')
-	createAt = FloatField(default=time.time)
+	createdAt = FloatField(default=time.time)
 
 class Blog(Model):
 	"""docstring for Blog"""
@@ -40,4 +40,4 @@ class Comment(Model):
     username = StringField(ddl='varchar(50)')
     img = StringField(ddl='varchar(500)')
     content = TextField()
-    created_at = FloatField(default=time.time)
+    createdAt = FloatField(default=time.time)
