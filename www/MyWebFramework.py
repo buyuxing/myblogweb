@@ -74,9 +74,18 @@ class RequestHandler(object):
 		self._required_kw_args = get_required_kw_args(fn)
 
 	async def __call__(self, request):
-		kw = {}
-		r = await self._func(**kw)
-		return r
+		kw = None
+		if self._has_var_kw_arg or self._has_named_kw_args or self._required_kw_args
+			if request.method == 'POST':
+				if not request.content_type:
+					return web.h
+
+		try:
+			r = await self._func(**kw)
+			return r
+		except APIError as e:
+			return dict(error=e.error, data=e.data, message=e.message)
+		
 		
 def add_route(app, fn):
 	method = getattr(fn,'__method__',None)
