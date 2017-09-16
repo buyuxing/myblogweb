@@ -4,7 +4,7 @@ create database myblog;
 
 use myblog;
 
-grant select, insert, update, delete on myblog.* to 'buyuxing'@'localhost' identified by 'buyuxing';
+grant select, insert, update, delete on myblog.* to 'buyuxing'@'localhost' identified by 'Tt123456';
 
 create table BYXUser(
 	`id` varchar(50) not null,
