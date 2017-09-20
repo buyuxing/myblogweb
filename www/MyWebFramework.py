@@ -6,6 +6,7 @@ from urllib import parse
 from aiohttp import web
 from apis import APIError
 
+import pdb
 
 def httpMethod(path,method):
 	def decorator(func):
@@ -145,8 +146,8 @@ def add_routes(app, module_name):
 	if n == (-1):
 		mod = __import__(module_name, globals(), locals())
 	else:
-		name = modele_name[n+1:]
-		mod = getattr(__import__(modele_name[:n],globals(),locals(),[name]),name)
+		name = module_name[n+1:]
+		mod = getattr(__import__(module_name[:n],globals(),locals(),[name]),name)
 	for attr in dir(mod):
 		if attr.startswith('_'):
 			continue
