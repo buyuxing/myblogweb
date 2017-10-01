@@ -20,6 +20,8 @@ import orm
 from MyWebFramework import add_routes, add_static
 import config
 
+from handlers import cookie2user, COOKIE_NAME
+
 def init_jinja2(app, **kw):
 	logging.info('init jinja2...')
 	options = dict(
@@ -89,6 +91,21 @@ async def response_factory(app, handler):
 		return resp
 	return response
 
+async def auth_factory(app, handler):
+    async def auth(request):
+        logging.info('check user: %s %s' % (request.method, request.path))
+        request.__user__ = None
+        cookie_str = request.cookies.get(COOKIE_NAME)
+        if cookie_str:
+            user = await cookie2user(cookie_str)
+            if user:
+                logging.info('set current user: %s' % user.email)
+                request.__user__ = user
+        if request.path.startswith('/manage/') and (request.__user__ is None or not request.__user__.admin):
+            return web.HTTPFound('/signin')
+        return (await handler(request))
+    return auth
+
 def datetime_filter(t):
 	delta = int(time.time()-t)
 	if delta < 60:
@@ -109,7 +126,7 @@ async def initDB(configs):
 async def init(loop):
 
 	await initDB(config.configs.db)
-	app = web.Application(loop=loop, middlewares=[logger_factory,response_factory])
+	app = web.Application(loop=loop, middlewares=[logger_factory,auth_factory,response_factory])
 	init_jinja2(app, filters=dict(datetime=datetime_filter))
 	add_routes(app, 'handlers')
 	add_static(app)

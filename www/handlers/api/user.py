@@ -49,11 +49,11 @@ async def cookie2user(cookie_str):
         user = await User.find(uid)
         if user is None:
             return None
-        s = '%s-%s-%s-%s' % (uid, user.passwd, expires, _COOKIE_KEY)
+        s = '%s-%s-%s-%s' % (uid, user.pwd, expires, _COOKIE_KEY)
         if sha1 != hashlib.sha1(s.encode('utf-8')).hexdigest():
             logging.info('invalid sha1')
             return None
-        user.passwd = '******'
+        user.pwd = '******'
         return user
     except Exception as e:
         logging.exception(e)
@@ -87,3 +87,32 @@ async def api_user_register(*, email, username, password):
 	r.content_type = 'application/json'
 	r.body = json.dumps(user, ensure_ascii=False).encode('utf-8')
 	return r
+
+@post('/api/user/signin')
+async def api_user_signin(*, username, password):
+    if not username or not username.strip():
+        raise APIValueError('username','账号不能为空')
+    if not password or not _RE_SHA1.match(password): 
+        raise APIValueError('password','密码不能为空')
+    user = await User.findAll('email = ? OR username = ?', [username, username])
+    if len(user) != 0: 
+        user = user[0]
+        in_pwd = hashlib.sha1(('%s:%s' % (user.id, password)).encode('utf-8')).hexdigest()
+        if in_pwd == user.pwd:
+            r = web.Response()
+            r.set_cookie(COOKIE_NAME, user2cookie(user, 86400), max_age = 86400, httponly = True)
+            user.password = '***'
+            r.content_type = 'application/json'
+            r.body = json.dumps(user, ensure_ascii=False).encode('utf-8')
+            return r
+        else:
+            logging.info('密码不一致:(%s)(%s)' % (in_pwd, user.pwd))
+    raise APIValueError('username_password','账号或密码错误')
+
+@get('/api/user/signout')
+async def api_user_signout(request):
+    referer = request.headers.get('Referer')
+    r = web.HTTPFound(referer or '/')
+    r.set_cookie(COOKIE_NAME, '-deleted-', max_age=0, httponly=True)
+    logging.info('user signed out.')
+    return r

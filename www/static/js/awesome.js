@@ -283,6 +283,7 @@ $(function () {
                 callback = data;
                 data = {};
             }
+            alert('asdasd')
             return this.each(function () {
                 var $form = $(this);
                 $form.showFormError();
@@ -344,6 +345,7 @@ function postJSON(url, data, callback) {
         callback = data;
         data = {};
     }
+    alert('asdasdsad')
     _httpJSON('POST', url, data, callback);
 }
 
