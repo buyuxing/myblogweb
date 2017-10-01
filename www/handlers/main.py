@@ -22,3 +22,8 @@ async def index(request):
 	'__template__': 'blogs.html',
 	'blogs': blogs
 	}
+@get('/register')
+async def register():
+	return {
+		'__template__': 'register.html'
+	}

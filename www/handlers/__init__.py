@@ -1,2 +1,4 @@
-from .handlers import *
-from .test import *
+__author__ = 'buyuxing'
+
+from .main import *
+from .api.user import *

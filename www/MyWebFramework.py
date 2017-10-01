@@ -6,8 +6,6 @@ from urllib import parse
 from aiohttp import web
 from apis import APIError
 
-import pdb
-
 def httpMethod(path,method):
 	def decorator(func):
 		@functools.wraps(func)
@@ -89,7 +87,7 @@ class RequestHandler(object):
 						return web.HTTPBadRequest('json body must be object.')
 					kw = params
 				elif ct.startswith('application/x-www-form-urlencoded') or ct.startswith('multipart/form-data'):
-					params = request.post()
+					params = await request.post()
 					kw = dict(**params)
 				else:
 					return web.HTTPBadRequest('Unsupported Content_Type: %s' % request.content_type)
@@ -117,7 +115,7 @@ class RequestHandler(object):
 		if self._required_kw_args:
 			for name in self._required_kw_args:
 				if not name in kw:
-					return web.HTTPBadRequest('Missing argument: %s' % name)
+					return web.HTTPBadRequest(reason = ('Missing argument: %s' % name))
 		logging.info('call with args: %s' % str(kw))
 
 		try:
