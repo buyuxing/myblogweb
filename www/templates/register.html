@@ -40,7 +40,6 @@ $(function () {
                     email: email,
                     password: CryptoJS.SHA1(this.password1).toString()
                 }, function (err, r) {
-                    alert('asdasdasd')
                     if (err) {
                         return $form.showFormError(err);
                     }
