@@ -12,12 +12,7 @@ from models import User, Blog, Comment, next_id
 
 @get('/')
 async def index(request):
-	summary = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
-	blogs = [
-		Blog(id='1', title='Test Blog', summary=summary, createdAt=time.time()-120),
-		Blog(id='2', title='Something New', summary=summary, createdAt=time.time()-3600),
-		Blog(id='3', title='Learn Swift', summary=summary, createdAt=time.time()-7200)
-		]
+	blogs = await Blog.findAll()
 
 	dic = {
 	'__template__': 'blogs.html',
@@ -38,4 +33,21 @@ async def register():
 async def signin():
 	return {
 		'__template__': 'signin.html'
+	}
+
+@get('/manage/blog/create')
+async def manage_blog_create():
+	return {
+		'__template__' : 'blogedit.html',
+		'id' : '',
+		'action' : '/api/blog/submit'
+	}
+
+@get('/blog/{id}')
+async def blog(id, request):
+	blog = await Blog.find(id)
+	return {
+		'__template__' : 'blog.html',
+		'blog' : blog,
+		'__user__' : request.__user__
 	}
