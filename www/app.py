@@ -45,6 +45,7 @@ def init_jinja2(app, **kw):
 
 async def logger_factory(app, handler):
 	async def parse_data(request):
+		logging.info('parse_data' + str(handler))
 		if request.method == 'POST':
 			if request.content_type.startswith('application/json'):
 				request.__data__ = await request.json()
@@ -56,7 +57,7 @@ async def logger_factory(app, handler):
 	return parse_data
 async def response_factory(app, handler):
 	async def response(request):
-		logging.info('response handler...')
+		logging.info('response handler...' + str(handler))
 		r = await handler(request)
 		if isinstance(r, web.StreamResponse):
 			return r
@@ -93,7 +94,7 @@ async def response_factory(app, handler):
 
 async def auth_factory(app, handler):
     async def auth(request):
-        logging.info('check user: %s %s' % (request.method, request.path))
+        logging.info('check user: %s %s' % (request.method, request.path) + str(handler))
         request.__user__ = None
         cookie_str = request.cookies.get(COOKIE_NAME)
         if cookie_str:
